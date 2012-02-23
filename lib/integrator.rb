@@ -7,6 +7,7 @@ require "integrator/version"
 require "integrator/client"
 require "integrator/base"
 require "integrator/nested"
+require "integrator/has_methods"
 require "integrator/model/academic_unit"
 require "integrator/model/career"
 require "integrator/model/career_programme"
@@ -37,3 +38,6 @@ module Integrator
     end
   end
 end
+
+ActiveRecord::Base.extend Integrator::HasMethods
+

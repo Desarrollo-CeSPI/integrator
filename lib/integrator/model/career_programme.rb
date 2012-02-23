@@ -2,6 +2,10 @@ module Integrator
   class CareerProgramme < Nested
     attr_reader :id, :career_id, :academic_unit_id, :programme, :year_count, :start_date, :total_subjects_count
     
+    def to_s
+      programme
+    end
+
     def academic_unit
       AcademicUnit.find(academic_unit_id)
     end

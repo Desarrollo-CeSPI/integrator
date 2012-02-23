@@ -2,6 +2,10 @@ module Integrator
   class Department < Nested
     attr_reader :id, :name, :state_id
     
+    def to_s
+      name
+    end
+    
     def state
       State.find(state_id)
     end

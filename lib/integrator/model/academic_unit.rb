@@ -2,6 +2,10 @@ module Integrator
   class AcademicUnit < Base
     attr_reader :id, :code, :name, :address_id, :email, :university, :ministry_reports_code, :type
     
+    def to_s
+      name
+    end
+
     def careers
       response = Client.get(subject: [self, Career])
       

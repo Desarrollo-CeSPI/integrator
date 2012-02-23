@@ -2,6 +2,10 @@ module Integrator
   class Career < Nested
     attr_reader :id, :code, :name, :academic_unit_id, :created_at
     
+    def to_s
+      name
+    end
+
     def academic_unit
       AcademicUnit.find(academic_unit_id)
     end
