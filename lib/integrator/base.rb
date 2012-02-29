@@ -2,9 +2,17 @@ module Integrator
   class Base
     class << self
       def find(id)
+        raise InvalidUrl.new('Id must be greater than 0') if id.to_i <= 0
+        
         response = Client.get subject: self, trailing: id
         
-        new(response)
+        if !response.include?('error')
+          new(response)
+        else
+          if /Token/i =~ response['error']
+            raise InvalidToken.new response['error']
+          end
+        end
       end
       
       def all

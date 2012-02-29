@@ -2,11 +2,14 @@ require "net/http"
 require "active_support/core_ext/object/to_query"
 require "active_support/core_ext/object/to_json"
 require "active_support/json"
+require "active_model"
+require "active_record"
 
 require "integrator/version"
 require "integrator/client"
 require "integrator/base"
 require "integrator/nested"
+require "integrator/exceptions"
 require "integrator/has_methods"
 require "integrator/model/academic_unit"
 require "integrator/model/career"
@@ -29,8 +32,8 @@ module Integrator
   def self.setup
     yield self
     
-    raise Exception.new('You must set the UNLP Integrator APIv2 url!') if @@url.nil?
-    raise Exception.new('You must set the UNLP Integrator APIv2 token!') if @@token.nil?
+    raise InvalidUrl.new('You must set the UNLP Integrator APIv2 url!') if @@url.nil?
+    raise InvalidToken.new('You must set the UNLP Integrator APIv2 token!') if @@token.nil?
     
     # remove trailing slash
     if @@url.end_with?('/')
@@ -40,4 +43,3 @@ module Integrator
 end
 
 ActiveRecord::Base.extend Integrator::HasMethods
-

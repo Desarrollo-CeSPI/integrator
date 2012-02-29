@@ -24,8 +24,16 @@ Gem::Specification.new do |s|
   
   s.add_development_dependency 'rake'
   s.add_development_dependency 'turn'
+  
   s.add_development_dependency 'activesupport'
   s.add_runtime_dependency 'activesupport'
+  
+  s.add_development_dependency 'activerecord'
+  s.add_runtime_dependency 'activerecord'
+  
+  s.add_development_dependency 'activemodel'
+  s.add_runtime_dependency 'activemodel'
+  
   s.add_development_dependency 'json'
   s.add_runtime_dependency 'json'
 end

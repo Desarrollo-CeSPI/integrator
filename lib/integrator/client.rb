@@ -22,9 +22,20 @@ module Integrator
       end
       
       def get(params = {})
-        response = Net::HTTP.get URI(build_uri(params))
+        uri = URI(build_uri(params))
+        #result = Net::HTTP.start uri.host, uri.port do |http|
+        #  http.get "#{uri.path}?#{uri.query}"
+        #end
         
-        ActiveSupport::JSON.decode(response)
+        begin
+          response = Net::HTTP.get_response(uri)
+        rescue Errno::ETIMEDOUT
+          raise ServerError.new("Could not establish connection. Timeout exceeded.")
+        end
+        
+        raise ServerError.new("Could not establish connection. Message: #{response.message}") if !response.is_a?(Net::HTTPSuccess)
+        
+        ActiveSupport::JSON.decode(response.body)
       end
       
       def build_params(params = {})
