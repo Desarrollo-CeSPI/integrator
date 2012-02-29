@@ -29,8 +29,8 @@ module Integrator
         
         begin
           response = Net::HTTP.get_response(uri)
-        rescue Errno::ETIMEDOUT
-          raise ServerError.new("Could not establish connection. Timeout exceeded.")
+        rescue Exception => error
+          raise ServerError.new("Could not establish connection: #{error.message}")
         end
         
         raise ServerError.new("Could not establish connection. Message: #{response.message}") if !response.is_a?(Net::HTTPSuccess)

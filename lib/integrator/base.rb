@@ -7,7 +7,7 @@ module Integrator
         response = Client.get subject: self, trailing: id
         
         if !response.include?('error')
-          new(response)
+          new(response) if !response.empty?
         else
           if /Token/i =~ response['error']
             raise InvalidToken.new response['error']
