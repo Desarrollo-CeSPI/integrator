@@ -12,7 +12,7 @@ class TestNested < Test::Unit::TestCase
   def setup
     Integrator.setup do |config|
       config.url = 'http://163.10.20.70/integrador_apiv2'
-      config.token = 'f436fd451214fc5b2e9dc06269877e2bdfe957dc'
+      config.token = 'b6351f2db94e4126055566036e7b384524a61d6f'
     end
   end
   
