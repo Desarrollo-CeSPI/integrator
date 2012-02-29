@@ -5,29 +5,42 @@ module Integrator
         raise InvalidUrl.new('Id must be greater than 0') if id.to_i <= 0
         
         response = Client.get subject: self, trailing: id
-        
-        if !response.include?('error')
+
+        process_response(response) do |response|
           new(response) if !response.empty?
+        end
+
+      end
+
+      
+      def all
+        response = Client.get subject: self
+
+        process_response(response) do |response|
+          response.collect do |item|
+            new(item)
+          end
+        end
+
+      end
+      
+      def count
+        response = Client.get subject: self, trailing: 'count'
+        process_response(response) do |response|
+          response['count'].to_i
+        end
+      end
+      
+      def process_response(response, &block)
+        if !response.include?('error')
+          yield response
         else
           if /Token/i =~ response['error']
             raise InvalidToken.new response['error']
           end
         end
       end
-      
-      def all
-        response = Client.get subject: self
-        
-        response.collect do |item|
-          new(item)
-        end
-      end
-      
-      def count
-        response = Client.get subject: self, trailing: 'count'
-        
-        response['count'].to_i
-      end
+    
     end
     
     def initialize(hash)

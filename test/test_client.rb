@@ -73,4 +73,66 @@ class TestClient < Test::Unit::TestCase
     
     assert_equal "/search/Mac%20Adden?token=#{Integrator.token}&type=teacher%2Cauthority", params
   end
+
+  def test_invalid_token
+    Integrator.setup do |config|
+      config.token = '1'
+    end
+    
+    assert_raise Integrator::InvalidToken do
+      Integrator::AcademicUnit.find(1)
+    end
+  end
+  
+  def test_without_url
+    assert_raise Integrator::InvalidUrl do
+      Integrator.setup do |config|
+        config.url = nil
+      end
+    end
+  end
+  
+  def test_without_token
+    assert_raise Integrator::InvalidToken do
+      Integrator.setup do |config|
+        config.token = nil
+      end
+    end
+  end
+  
+  def test_id_must_be_greater_than_zero
+    assert_raise Integrator::InvalidUrl do
+      Integrator::AcademicUnit.find(0)
+    end
+  end
+  
+  def test_http_error
+    Integrator.setup do |config|
+      config.url = 'http://163.10.20.70/integrador_aaaapiv2'
+    end
+    
+    assert_raise Integrator::ServerError do
+      Integrator::AcademicUnit.find(1)
+    end
+  end
+  
+  def test_connection_refused
+    Integrator.setup do |config|
+      config.url = 'http://127.0.0.1:1/integrador_apiv2'
+    end
+    
+    assert_raise Integrator::ServerError do
+      Integrator::AcademicUnit.find(1)
+    end
+  end
+
+  def test_unexisting_server
+    Integrator.setup do |config|
+      config.url = 'http://1.1.1.1/integrador_apiv2'
+    end
+    
+    assert_raise Integrator::ServerError do
+      Integrator::AcademicUnit.find(1)
+    end
+  end
 end
