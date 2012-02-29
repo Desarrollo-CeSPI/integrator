@@ -114,9 +114,19 @@ class TestBase < Test::Unit::TestCase
     end
   end
   
+  def test_connection_refused
+    Integrator.setup do |config|
+      config.url = 'http://127.0.0.1:1/integrador_apiv2'
+    end
+    
+    assert_raise Integrator::ServerError do
+      Integrator::AcademicUnit.find(1)
+    end
+  end
+
   def test_unexisting_server
     Integrator.setup do |config|
-      config.url = 'http://163.10.20.1/integrador_apiv2'
+      config.url = 'http://1.1.1.1/integrador_apiv2'
     end
     
     assert_raise Integrator::ServerError do
