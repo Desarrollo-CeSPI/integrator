@@ -5,12 +5,20 @@ module Integrator
     def to_s
       name
     end
-
+    
     def careers
       response = Client.get(subject: [self, Career])
       
       response.collect do |item|
         Career.new(item)
+      end
+    end
+
+    def degrees
+      response = Client.get(subject: [self, Degree])
+      
+      response.collect do |item|
+        Degree.new(item)
       end
     end
     

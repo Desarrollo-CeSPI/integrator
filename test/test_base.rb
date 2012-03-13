@@ -11,19 +11,23 @@ require 'integrator'
 class TestBase < Test::Unit::TestCase
   def setup
     Integrator.setup do |config|
-      config.url = 'http://163.10.20.70/integrador_apiv2'
-      config.token = 'b6351f2db94e4126055566036e7b384524a61d6f'
+      #config.url = 'http://163.10.20.70/integrador_apiv2'
+      #config.token = 'b6351f2db94e4126055566036e7b384524a61d6f'
+      config.url = 'http://localhost/integrador_apiv2'
+      config.token = 'eef71ad13258632b0bdb4acda6bc0f1f7d77d297'
     end
   end
   
   def test_find
     [
+      Integrator::AcademicDegreeType,
       Integrator::AcademicUnit,
       Integrator::Career,
       Integrator::CareerProgramme,
       Integrator::CareerSubject,
       Integrator::City,
       Integrator::Country,
+      Integrator::Degree,
       Integrator::Department,
       Integrator::DocumentType,
       Integrator::Gender,
@@ -36,12 +40,13 @@ class TestBase < Test::Unit::TestCase
       assert_equal 1, object.id.to_i if !object.nil?
     end
     
-    object = Integrator::Person.find('00000000000000000000031940555').id
-    assert_equal '00000000000000000000031940555', object.id if !object.nil?
+    object = Integrator::Person.find('000000000000000000000000031940555')
+    assert_equal '000000000000000000000000031940555', object.id if !object.nil?
   end
   
   def test_all
     [
+      Integrator::AcademicDegreeType,
       Integrator::AcademicUnit,
       Integrator::Country,
       Integrator::DocumentType,
@@ -59,6 +64,7 @@ class TestBase < Test::Unit::TestCase
   
   def test_count
     [
+      Integrator::AcademicDegreeType,
       Integrator::AcademicUnit,
       Integrator::Country,
       Integrator::DocumentType,
