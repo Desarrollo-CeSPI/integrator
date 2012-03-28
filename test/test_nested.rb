@@ -27,7 +27,8 @@ class TestNested < Test::Unit::TestCase
       Integrator::Degree,
       Integrator::Department,
       Integrator::Paycheck,
-      Integrator::State
+      Integrator::State,
+      Integrator::CareerProgrammeDegree
     ].each do |klass|
       assert_raise Exception do
         klass.all
@@ -44,7 +45,8 @@ class TestNested < Test::Unit::TestCase
       Integrator::Degree,
       Integrator::Department,
       Integrator::Paycheck,
-      Integrator::State
+      Integrator::State,
+      Integrator::CareerProgrammeDegree
     ].each do |klass|
       assert_raise Exception do
         klass.count

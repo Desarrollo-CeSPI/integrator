@@ -33,7 +33,8 @@ class TestBase < Test::Unit::TestCase
       Integrator::Gender,
       Integrator::MaritalStatus,
       Integrator::Paycheck,
-      Integrator::State
+      Integrator::State,
+      Integrator::CareerProgrammeDegree
     ].each do |klass|
       object = klass.find(1)
       

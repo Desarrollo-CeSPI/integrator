@@ -13,5 +13,11 @@ module Integrator
     def academic_unit_degree_type
       AcademicUnitDegree.find(academic_unit_degree_type_id)
     end
+    
+    def career_programme_degrees
+      response = Client.get subject: [academic_unit, self, CareerProgrammeDegree]
+      
+      response.collect { |item| CareerSubject.new(item) }
+    end
   end
 end
