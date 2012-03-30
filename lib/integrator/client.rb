@@ -1,15 +1,13 @@
 module Integrator
   class Client
     class << self
-      def build_uri(params = {})
-        raise Exception.new('You must specify the subject') if !params.include?(:subject)
-        
-        if !params[:subject].is_a? Array
-          params[:subject] = [params[:subject]]
+      def slices_from_subject(subject)
+        if !subject.is_a? Array
+          subject = [subject]
         end
         
         slices = []
-        params[:subject].each do |item|
+        subject.each do |item|
           if item.is_a? Class
             slices << item.name.split('::').last.underscore
           else
@@ -18,17 +16,40 @@ module Integrator
           end
         end
         
-        Integrator.url + '/api/' + slices.join('/') + '.json' + build_params(params)
+        slices.join('/')
+      end
+      
+      def build_uri(params = {})
+        raise Exception.new('You must specify the subject') if !params.include?(:subject)
+        
+        Integrator.url + '/api/' + slices_from_subject(params[:subject]) + '.json' + build_params(params)
+      end
+      
+      def build_search_uri(params = {})
+        raise Exception.new('You must specify the subject') if !params.include?(:subject)
+        
+        Integrator.url + '/api/' + slices_from_subject(params[:subject]) + '.json/search/' + build_params(params)
       end
       
       def get(params = {})
         uri = URI(build_uri(params))
-        #result = Net::HTTP.start uri.host, uri.port do |http|
-        #  http.get "#{uri.path}?#{uri.query}"
-        #end
         
         begin
           response = Net::HTTP.get_response(uri)
+        rescue Exception => error
+          raise ServerError.new("Could not establish connection: #{error.message}")
+        end
+        
+        raise ServerError.new("Could not establish connection. Message: #{response.message}") if !response.is_a?(Net::HTTPSuccess)
+        
+        ActiveSupport::JSON.decode(response.body)
+      end
+      
+      def search(params = {})
+        uri = URI build_search_uri(params)
+        
+        begin
+          response = Net::HTTP.get_response uri
         rescue Exception => error
           raise ServerError.new("Could not establish connection: #{error.message}")
         end

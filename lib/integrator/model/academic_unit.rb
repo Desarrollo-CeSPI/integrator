@@ -37,5 +37,13 @@ module Integrator
         Person.new(item)
       end
     end
+    
+    def search_people(q, type = 'student,authority,teacher')
+      response = Client.search subject: [self, Person], trailing: q.gsub(' ', '%20'), extra_params: { type: type }
+      
+      response.collect do |item|
+        Person.new(item)
+      end
+    end
   end
 end
