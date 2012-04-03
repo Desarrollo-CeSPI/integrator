@@ -3,7 +3,7 @@ module Integrator
     attr_reader :id, :academic_unit_id, :code, :name, :female_name, :academic_unit_degree_type_id
     
     def to_s
-      name
+      "#{name}/#{female_name}"
     end
     
     def academic_unit
