@@ -24,5 +24,19 @@ module Integrator
         AcademicData.new(item)
       end
     end
+
+    def is_graduated(academic_unit, career, degree)
+      url = Integrator.url + "/api/person/#{id}/is_graduated.json/#{academic_unit.id}/#{career.id}/#{degree.id}"
+      
+      begin
+        response = Net::HTTP.get_response(uri)
+      rescue Exception => error
+        raise ServerError.new("Could not establish connection: #{error.message}")
+      end
+      
+      raise ServerError.new("Could not establish connection. Message: #{response.message}") if !response.is_a?(Net::HTTPSuccess)
+      
+      ActiveSupport::JSON.decode(response.body)
+    end
   end
 end
