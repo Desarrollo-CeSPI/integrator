@@ -16,5 +16,13 @@ module Integrator
         new(item)
       end
     end
+
+    def academic_datas
+      response = Client.get(subject: [self, AcademicData])
+      
+      response.collect do |item|
+        AcademicData.new(item)
+      end
+    end
   end
 end
