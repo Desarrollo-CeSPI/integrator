@@ -25,7 +25,7 @@ module Integrator
     def career_programme_degrees
       response = Client.get subject: [academic_unit, career, self, CareerProgrammeDegree]
       
-      response.collect { |item| CareerSubject.new(item) }
+      response.collect { |item| CareerProgrammeDegree.new(item) }
     end
   end
 end
