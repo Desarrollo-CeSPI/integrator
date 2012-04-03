@@ -26,7 +26,7 @@ module Integrator
     end
 
     def is_graduated(academic_unit, career, degree)
-      url = Integrator.url + "/api/person/#{id}/is_graduated.json/#{academic_unit.id}/#{career.id}/#{degree.id}"
+      url = Integrator.url + "/api/person/#{id}/is_graduated.json/#{academic_unit.id}/#{career.id}/#{degree.id}?token=#{Integrator.token}"
       uri = URI(url)
 
       begin
