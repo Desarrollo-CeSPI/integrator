@@ -3,7 +3,7 @@ module Integrator
     attr_reader :id, :first_name, :last_name, :document_type_id, :document_number, :gender_id, :cuil, :birth_date, :updated_at, :created_at, :document_emitting_entity_id, :document_type, :gender, :document_emitting_entity
     
     def to_s
-      "#{first_name} #{last_name}"
+      "#{first_name} #{last_name} [CUIL/CUIT: #{cuil ? cuil : 'N/A'}]"
     end
 
     def self.search(query, params = {})
