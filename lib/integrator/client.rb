@@ -32,10 +32,14 @@ module Integrator
       end
       
       def get(params = {})
-        uri = URI(build_uri(params))
+        uri = URI.parse build_uri(params)
         
         begin
-          response = Net::HTTP.get_response(uri)
+          http = Net::HTTP.new(url.host, url.port)
+          http.use_ssl = (url.scheme == 'https')
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          request = Net::HTTP::Get.new("#{url.path}?#{url.query}")
+          response = http.request(request)
         rescue Exception => error
           raise ServerError.new("Could not establish connection: #{error.message}")
         end
@@ -46,10 +50,14 @@ module Integrator
       end
       
       def search(params = {})
-        uri = URI build_search_uri(params)
+        uri = URI.parse build_search_uri(params)
         
         begin
-          response = Net::HTTP.get_response uri
+          http = Net::HTTP.new(url.host, url.port)
+          http.use_ssl = (url.scheme == 'https')
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          request = Net::HTTP::Get.new("#{url.path}?#{url.query}")
+          response = http.request(request)
         rescue Exception => error
           raise ServerError.new("Could not establish connection: #{error.message}")
         end

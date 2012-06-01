@@ -27,10 +27,14 @@ module Integrator
 
     def is_graduated(academic_unit, career, degree)
       url = Integrator.url + "/api/person/#{id}/is_graduated.json/#{academic_unit.id}/#{career.id}/#{degree.id}?token=#{Integrator.token}"
-      uri = URI(url)
+      uri = URI.parse url
 
       begin
-        response = Net::HTTP.get_response(uri)
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = (url.scheme == 'https')
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        request = Net::HTTP::Get.new("#{url.path}?#{url.query}")
+        response = http.request(request)
       rescue Exception => error
         raise ServerError.new("Could not establish connection: #{error.message}")
       end
