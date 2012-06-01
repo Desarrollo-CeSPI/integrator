@@ -32,7 +32,7 @@ module Integrator
       end
       
       def get(params = {})
-        uri = URI.parse build_uri(params)
+        url = URI.parse build_uri(params)
         
         begin
           http = Net::HTTP.new(url.host, url.port)
@@ -50,7 +50,7 @@ module Integrator
       end
       
       def search(params = {})
-        uri = URI.parse build_search_uri(params)
+        url = URI.parse build_search_uri(params)
         
         begin
           http = Net::HTTP.new(url.host, url.port)

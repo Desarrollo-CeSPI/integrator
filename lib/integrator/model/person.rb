@@ -27,7 +27,7 @@ module Integrator
 
     def is_graduated(academic_unit, career, degree)
       url = Integrator.url + "/api/person/#{id}/is_graduated.json/#{academic_unit.id}/#{career.id}/#{degree.id}?token=#{Integrator.token}"
-      uri = URI.parse url
+      url = URI.parse url
 
       begin
         http = Net::HTTP.new(url.host, url.port)
