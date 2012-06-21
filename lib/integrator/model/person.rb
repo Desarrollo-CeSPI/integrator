@@ -17,6 +17,14 @@ module Integrator
       end
     end
 
+    def male?
+      gender_id == 2
+    end
+    
+    def female?
+      gender_id == 1
+    end
+
     def academic_datas
       response = Client.get(subject: [self, AcademicData])
       
