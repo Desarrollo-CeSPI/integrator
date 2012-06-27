@@ -3,7 +3,7 @@ module Integrator
     attr_accessor :id, :person_id, :email
 
     def to_s
-      "#{person} <#{email}>"
+      "#{person.first_name} #{person.last_name} <#{email}>"
     end
 
     def person
