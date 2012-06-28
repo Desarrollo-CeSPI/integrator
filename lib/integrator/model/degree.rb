@@ -1,6 +1,6 @@
 module Integrator
   class Degree < Nested
-    attr_reader :id, :academic_unit_id, :code, :name, :female_name, :academic_unit_degree_type_id
+    attr_reader :id, :academic_unit_id, :code, :name, :female_name, :academic_unit_degree_type_id, :araucano_code
     
     def to_s
       "#{name}/#{female_name}"
