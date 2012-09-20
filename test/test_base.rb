@@ -12,7 +12,7 @@ class TestBase < Test::Unit::TestCase
   def setup
     Integrator.setup do |config|
       #config.url = 'http://163.10.20.70/integrador_apiv2'
-      #config.token = 'b6351f2db94e4126055566036e7b384524a61d6f'
+      #config.token = '2bd4fa09ddf878e819ae959be8ba726efc78dd3a'
       config.url = 'http://localhost/integrador_apiv2'
       config.token = 'eef71ad13258632b0bdb4acda6bc0f1f7d77d297'
     end
