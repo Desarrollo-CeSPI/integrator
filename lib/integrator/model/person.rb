@@ -18,11 +18,11 @@ module Integrator
     end
 
     def male?
-      gender_id == 2
+      gender_id.to_i == 2
     end
     
     def female?
-      gender_id == 1
+      gender_id.to_i == 1
     end
 
     def academic_datas
