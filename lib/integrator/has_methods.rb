@@ -10,7 +10,7 @@ module Integrator
 
         define_method method_name do
           if defined? Rails
-            Rails.cache.fetch("Integrator::#{class_as_syn.to_s.camelize}.find(#{send(k).to_s})") do
+            Rails.cache.fetch("Integrator::#{class_as_sym.to_s.camelize}.find(#{send(k).to_s})") do
               eval("Integrator::#{class_as_sym.to_s.camelize}").find(send(k).to_s)
             end
           else
