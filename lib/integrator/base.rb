@@ -7,10 +7,8 @@ module Integrator
         process_response(response) do |response|
           new(response) if !response.empty?
         end
-
       end
 
-      
       def all
         response = Client.get subject: self
 
@@ -19,9 +17,8 @@ module Integrator
             new(item)
           end
         end
-
       end
-      
+
       def count
         response = Client.get subject: self, trailing: 'count'
         process_response(response) do |response|
@@ -38,9 +35,8 @@ module Integrator
           end
         end
       end
-    
     end
-    
+
     def initialize(hash)
       hash.each do |key, value|
         instance_variable_set("@#{key}", value) if respond_to?(key.to_sym)
