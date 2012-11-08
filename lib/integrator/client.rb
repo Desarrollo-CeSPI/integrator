@@ -69,19 +69,38 @@ module Integrator
       end
 
       def search(params = {})
-        url = URI.parse build_search_uri(params)
+        uri = build_search_uri(params)
+        url = URI.parse uri
 
-        begin
+        proc = Proc.new do
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = (url.scheme == 'https')
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
           request = Net::HTTP::Get.new("#{url.path}?#{url.query}")
           response = http.request(request)
+        end
+
+        response = begin
+          if defined? Rails
+            if defined? Rack::MiniProfiler
+              Rack::MiniProfiler.step("Searching #{uri}") do
+                Rails.cache.fetch(uri) do
+                  proc.call
+                end
+              end
+            else
+              Rails.cache.fetch(uri) do
+                proc.call
+              end
+            end
+          else
+            proc.call
+          end
         rescue Exception => error
           raise ServerError.new("Could not establish connection: #{error.message}")
         end
 
-        raise ServerError.new("Could not establish connection. Message: #{response.message}") if !response.is_a?(Net::HTTPSuccess)
+        raise ServerError.new("Could not establish connection. Message: #{response.message}") unless response.is_a?(Net::HTTPSuccess)
 
         ActiveSupport::JSON.decode(response.body)
       end
