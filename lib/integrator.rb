@@ -1,6 +1,10 @@
 require "net/http"
 require "active_support/core_ext/object/to_query"
-require "active_support/core_ext/object/to_json"
+begin
+  require "active_support/core_ext/object/to_json"
+rescue LoadError
+puts "Active support to json not present"
+end
 require "active_support/json"
 require "active_model"
 require "active_record"
