@@ -41,6 +41,12 @@ module Integrator
       end
     end
 
+    def person_roles
+      Client.get(subject: [self, PersonRole]).map do |item|
+        PersonRole.new(item)
+      end
+    end
+
     def is_graduated(academic_unit, career, degree)
       url = Integrator.url + "/api/person/#{id}/is_graduated.json/#{academic_unit.id}/#{career.id}/#{degree.id}?token=#{Integrator.token}"
       url = URI.parse url

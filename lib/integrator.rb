@@ -3,7 +3,6 @@ require "active_support/core_ext/object/to_query"
 begin
   require "active_support/core_ext/object/to_json"
 rescue LoadError
-puts "Active support to json not present"
 end
 require "active_support/json"
 require "active_model"
@@ -30,6 +29,7 @@ require "integrator/model/department"
 require "integrator/model/city"
 require "integrator/model/document_type"
 require "integrator/model/paycheck"
+require "integrator/model/person_role"
 require "integrator/model/person"
 require "integrator/model/gender"
 require "integrator/model/marital_status"
