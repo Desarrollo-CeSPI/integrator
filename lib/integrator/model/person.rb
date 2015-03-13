@@ -65,5 +65,24 @@ module Integrator
       
       ActiveSupport::JSON.decode(response.body)
     end
+
+    def personal_charges
+      url = Integrator.url + "/api/person/#{id}/personal_charge.json?token=#{Integrator.token}"
+      url = URI.parse url
+
+      begin
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = (url.scheme == 'https')
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        request = Net::HTTP::Get.new("#{url.path}?#{url.query}")
+        response = http.request(request)
+      rescue Exception => error
+        raise ServerError.new("Could not establish connection: #{error.message}")
+      end
+      
+      raise ServerError.new("Could not establish connection. Message: #{response.message}") if !response.is_a?(Net::HTTPSuccess)
+      
+      ActiveSupport::JSON.decode(response.body)
+    end
   end
 end
