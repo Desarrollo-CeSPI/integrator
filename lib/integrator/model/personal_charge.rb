@@ -11,7 +11,7 @@ module Integrator
     end
 
     def active_at?(date)
-      starts_at.to_date <= date && ends_at.to_date >= date
+      starts_at.to_date <= date && (ends_at.nil? || ends_at.to_date >= date)
     end
   end
 end
