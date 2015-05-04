@@ -5,6 +5,14 @@ module Integrator
     def to_s
       name
     end
+
+    def name
+      if @name.respond_to?(:html_safe)
+        @name.html_safe
+      else
+        @name
+      end
+    end
     
     def careers
       response = Client.get(subject: [self, Career])
