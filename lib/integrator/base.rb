@@ -27,10 +27,10 @@ module Integrator
       end
       
       def process_response(response, &block)
-        if response && !response.include?('error')
-          yield response
-        else
-          if /Token/i =~ response['error']
+        if response
+          if !response.include?('error')
+            yield response
+          elsif /Token/i =~ response['error']
             raise InvalidToken.new response['error']
           end
         end
