@@ -66,7 +66,7 @@ module Integrator
         case response
           when Net::HTTPClientError
             nil
-          when Net::HTTPClientSuccess
+          when Net::HTTPSuccess
             ActiveSupport::JSON.decode(response.body)
           else
             raise ServerError.new("Could not establish connection. Message: #{response.message}")
@@ -108,7 +108,7 @@ module Integrator
         case response
           when Net::HTTPClientError
             []
-          when Net::HTTPClientSuccess
+          when Net::HTTPSuccess
             ActiveSupport::JSON.decode(response.body)
           else
             raise ServerError.new("Could not establish connection. Message: #{response.message}")
