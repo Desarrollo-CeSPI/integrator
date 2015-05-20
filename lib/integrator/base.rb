@@ -27,7 +27,7 @@ module Integrator
       end
       
       def process_response(response, &block)
-        if !response.include?('error')
+        if response && !response.include?('error')
           yield response
         else
           if /Token/i =~ response['error']
