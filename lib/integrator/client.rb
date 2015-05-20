@@ -63,9 +63,14 @@ module Integrator
           raise ServerError.new("Could not establish connection: #{error.message}")
         end
 
-        raise ServerError.new("Could not establish connection. Message: #{response.message}") if !response.is_a?(Net::HTTPSuccess)
-
-        ActiveSupport::JSON.decode(response.body)
+        case response
+          when Net::HTTPClientError
+            nil
+          when Net::HTTPClientSuccess
+            ActiveSupport::JSON.decode(response.body)
+          else
+            raise ServerError.new("Could not establish connection. Message: #{response.message}")
+        end
       end
 
       def search(params = {})
@@ -100,9 +105,14 @@ module Integrator
           raise ServerError.new("Could not establish connection: #{error.message}")
         end
 
-        raise ServerError.new("Could not establish connection. Message: #{response.message}") unless response.is_a?(Net::HTTPSuccess)
-
-        ActiveSupport::JSON.decode(response.body)
+        case response
+          when Net::HTTPClientError
+            []
+          when Net::HTTPClientSuccess
+            ActiveSupport::JSON.decode(response.body)
+          else
+            raise ServerError.new("Could not establish connection. Message: #{response.message}")
+        end
       end
 
       def build_params(params = {})
