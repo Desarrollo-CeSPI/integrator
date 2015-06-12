@@ -1,8 +1,4 @@
-require 'bundler/setup'
-require 'cespigems'
-
-Cespigems::GemHelper.install_tasks
-
+require 'cespigems/gem_tasks'
 require 'rake/testtask'
 
 Rake::TestTask.new do |t|
