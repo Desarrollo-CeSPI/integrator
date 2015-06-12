@@ -16,8 +16,12 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ['lib']
 
+  s.metadata['allowed_push_host'] = "http://gems.desarrollo.unlp.edu.ar" if s.respond_to?(:metadata)
+
+
   s.add_development_dependency 'rake'
   s.add_development_dependency 'turn'
+  s.add_development_dependency 'cespigems', '~> 0.1'
 
   s.add_runtime_dependency 'activesupport'
   s.add_runtime_dependency 'activerecord'
