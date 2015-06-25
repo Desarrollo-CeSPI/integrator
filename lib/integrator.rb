@@ -36,12 +36,13 @@ require "integrator/model/gender"
 require "integrator/model/marital_status"
 
 module Integrator
-  mattr_accessor :url, :token
+  mattr_accessor :url, :token, :expires_in
   
   # setup Integrator
   def self.setup
     yield self
     
+    self.expires_in ||= 1.hour
     raise InvalidUrl.new('You must set the UNLP Integrator APIv2 url!') if @@url.nil?
     raise InvalidToken.new('You must set the UNLP Integrator APIv2 token!') if @@token.nil?
     

@@ -4,4 +4,6 @@ Integrator.setup do |config|
   
   # configure your token for accessing UNLP Integrator APIv2
   config.token = ''
+
+  # config.expires_in = 1.hour
 end
