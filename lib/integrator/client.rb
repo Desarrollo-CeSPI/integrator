@@ -47,12 +47,12 @@ module Integrator
           if defined? Rails
             if defined? Rack::MiniProfiler
               Rack::MiniProfiler.step("Fetching #{uri}") do
-                Rails.cache.fetch(uri, Integrator.expires_in) do
+                Rails.cache.fetch(uri, :expires_in => Integrator.expires_in) do
                   proc.call
                 end
               end
             else
-              Rails.cache.fetch(uri, Integrator.expires_in) do
+              Rails.cache.fetch(uri, :expires_in => Integrator.expires_in) do
                 proc.call
               end
             end
@@ -89,12 +89,12 @@ module Integrator
           if defined? Rails
             if defined? Rack::MiniProfiler
               Rack::MiniProfiler.step("Searching #{uri}") do
-                Rails.cache.fetch(uri, Integrator.expires_in) do
+                Rails.cache.fetch(uri, :expires_in => Integrator.expires_in) do
                   proc.call
                 end
               end
             else
-              Rails.cache.fetch(uri, Integrator.expires_in) do
+              Rails.cache.fetch(uri, :expires_in => Integrator.expires_in) do
                 proc.call
               end
             end
