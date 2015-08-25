@@ -118,9 +118,9 @@ module Integrator
       def build_params(params = {})
         ret = if params.include?(:trailing)
           if params[:trailing].is_a? Array
-            '/' + params[:trailing].join('/').gsub(' ', '%20')
+            '/' + params[:trailing].map { |x| URI.encode(x.to_s) }.join('/')
           else
-            '/' + params[:trailing].to_s
+            '/' + URI.encode(params[:trailing].to_s)
           end
         else
           ''
