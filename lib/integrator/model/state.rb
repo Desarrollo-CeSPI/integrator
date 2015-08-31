@@ -1,6 +1,10 @@
 module Integrator
   class State < Nested
     attr_reader :id, :name, :country_id
+
+    def to_s
+      name
+    end
     
     def country
       Country.find(country_id)
