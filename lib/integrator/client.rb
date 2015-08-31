@@ -90,7 +90,6 @@ module Integrator
 
       def request_handler(uri)
         Proc.new do
-          p "Querying #{uri}"
           url = URI.parse uri
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = url.scheme == 'https'
