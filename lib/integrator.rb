@@ -14,6 +14,7 @@ require "integrator/base"
 require "integrator/nested"
 require "integrator/exceptions"
 require "integrator/has_methods"
+require "integrator/academic_unit_mapper"
 require "integrator/model/academic_data"
 require "integrator/model/academic_degree_type"
 require "integrator/model/academic_unit"
@@ -47,9 +48,7 @@ module Integrator
     raise InvalidToken.new('You must set the UNLP Integrator APIv2 token!') if @@token.nil?
     
     # remove trailing slash
-    if @@url.end_with?('/')
-      @@url.chomp!('/')
-    end
+    @@url.chomp!('/') if @@url.end_with?('/')
   end
 end
 
