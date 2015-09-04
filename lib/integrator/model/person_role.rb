@@ -10,11 +10,11 @@ module Integrator
     end
 
     def person
-      @person ||= Person.find(person_id)
+      @_person ||= Person.find(person_id)
     end
     
     def academic_unit
-      @academic_unit ||= AcademicUnit.find(academic_unit_id)
+      @_academic_unit ||= AcademicUnit.find(academic_unit_id)
     end
 
     # Defines methods to normalize the API for objects of this class:

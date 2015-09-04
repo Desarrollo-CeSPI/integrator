@@ -7,11 +7,11 @@ module Integrator
     end
 
     def career_programme
-      CareerProgramme.find(career_programme_id)
+      @_career_programme ||= CareerProgramme.find(career_programme_id)
     end
     
     def degree
-      Degree.find(degree_id)
+      @_degree ||= Degree.find(degree_id)
     end
   end
 end

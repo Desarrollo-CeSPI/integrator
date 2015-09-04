@@ -7,11 +7,7 @@ module Integrator
     end
     
     def states
-      response = Client.get(subject: [self, State])
-      
-      response.collect do |item|
-        State.new(item)
-      end
+      get_and_hydrate_collection State, subject: [self, State]
     end
   end
 end

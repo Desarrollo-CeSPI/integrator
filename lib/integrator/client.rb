@@ -2,9 +2,7 @@ module Integrator
   class Client
     class << self
       def slices_from_subject(subject)
-        if !subject.is_a? Array
-          subject = [subject]
-        end
+        subject = [subject] unless subject.is_a? Array
 
         slices = []
         subject.each do |item|
@@ -20,14 +18,12 @@ module Integrator
       end
 
       def build_uri(params = {})
-        raise Exception.new('You must specify the subject') if !params.include?(:subject)
-
+        ensure_subject(params)
         Integrator.url + '/api/' + slices_from_subject(params[:subject]) + '.json' + build_params(params)
       end
 
       def build_search_uri(params = {})
-        raise Exception.new('You must specify the subject') if !params.include?(:subject)
-
+        ensure_subject(params)
         Integrator.url + '/api/' + slices_from_subject(params[:subject]) + '.json/search/' + build_params(params)
       end
 
@@ -112,6 +108,10 @@ module Integrator
         else
           raise ServerError.new("Could not establish connection. Message: #{response.message}")
         end
+      end
+
+      def ensure_subject(params)
+        raise Exception.new('You must specify the subject') unless params.include?(:subject)
       end
     end
   end

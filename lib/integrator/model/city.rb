@@ -7,7 +7,7 @@ module Integrator
     end
 
     def department
-      Department.find(department_id)
+      @_department ||= Department.find(department_id)
     end
   end
 end

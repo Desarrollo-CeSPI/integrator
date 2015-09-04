@@ -4,16 +4,16 @@ module Integrator
       def find(id)
         response = Client.get subject: self, trailing: id
 
-        process_response(response) do |response|
-          new(response) if !response.empty?
+        process_response(response) do |r|
+          new(r) unless r.empty?
         end
       end
 
       def all
         response = Client.get subject: self
 
-        process_response(response) do |response|
-          response.collect do |item|
+        process_response(response) do |r|
+          r.collect do |item|
             new(item)
           end
         end
@@ -21,8 +21,8 @@ module Integrator
 
       def count
         response = Client.get subject: self, trailing: 'count'
-        process_response(response) do |response|
-          response['count'].to_i
+        process_response(response) do |r|
+          r['count'].to_i
         end
       end
       
@@ -35,6 +35,18 @@ module Integrator
           end
         end
       end
+
+      def get_and_hydrate_collection(target_class, client_params = {})
+        hydrate_collection Client.get(client_params), target_class
+      end
+
+      def search_and_hydrate_collection(target_class, client_params = {})
+        hydrate_collection Client.search(client_params), target_class
+      end
+
+      def hydrate_collection(collection, target_class)
+        collection.map { |item_data| target_class.new(item_data) }
+      end
     end
 
     def initialize(hash)
@@ -42,5 +54,7 @@ module Integrator
         instance_variable_set("@#{key}", value) if respond_to?(key.to_sym)
       end
     end
+
+    delegate :get_and_hydrate_collection, :search_and_hydrate_collection, :hydrate_collection, :to => :class
   end
 end

@@ -3,18 +3,12 @@ module Integrator
     attr_reader :id, :first_name, :last_name, :document_type_id, :document_number, :gender_id, :cuil, :birth_date, :updated_at, :created_at, :document_emitting_entity_id, :document_type, :gender, :document_emitting_entity
     
     def to_s
-      "#{first_name} #{last_name} [CUIL/CUIT: #{cuil ? cuil : 'N/A'}]"
+      "#{first_name.strip} #{last_name.strip} (CUIL/CUIT: #{cuil || '-'})"
     end
 
     def self.search(query, params = {})
-      
       params.merge! subject: self, trailing: ['search', query]
-      
-      response = Client.get params
-      
-      response.collect do |item|
-        new(item)
-      end
+      get_and_hydrate_collection self, params
     end
 
     def male?
@@ -26,25 +20,15 @@ module Integrator
     end
 
     def academic_datas
-      response = Client.get(subject: [self, AcademicData])
-      
-      response.collect do |item|
-        AcademicData.new(item)
-      end
+      get_and_hydrate_collection AcademicData, subject: [self, AcademicData]
     end
 
     def emails
-      response = Client.get(subject: [self, PersonEmail])
-      
-      response.collect do |item|
-        PersonEmail.new(item)
-      end
+      get_and_hydrate_collection PersonEmail, subject: [self, PersonEmail]
     end
 
     def person_roles
-      Client.get(subject: [self, PersonRole]).map do |item|
-        PersonRole.new(item)
-      end
+      get_and_hydrate_collection PersonRole, subject: [self, PersonRole]
     end
 
     def is_graduated(academic_unit, career, degree)
@@ -67,9 +51,7 @@ module Integrator
     end
 
     def personal_charges
-      Client.get(subject: [self, PersonalCharge]).map do |item|
-        PersonalCharge.new(item)
-      end
+      get_and_hydrate_collection PersonalCharge, subject: [self, PersonalCharge]
     end
   end
 end

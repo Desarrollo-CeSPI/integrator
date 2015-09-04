@@ -7,15 +7,11 @@ module Integrator
     end
 
     def academic_unit
-      AcademicUnit.find(academic_unit_id)
+      @_academic_unit ||= AcademicUnit.find(academic_unit_id)
     end
     
     def career_programmes
-      response = Client.get(subject: [academic_unit, self, CareerProgramme])
-      
-      response.collect do |item|
-        CareerProgramme.new(item)
-      end
+      get_and_hydrate_collection CareerProgramme, subject: [academic_unit, self, CareerProgramme]
     end
   end
 end

@@ -7,25 +7,19 @@ module Integrator
     end
 
     def academic_unit
-      AcademicUnit.find(academic_unit_id)
+      @_academic_unit ||= AcademicUnit.find(academic_unit_id)
     end
     
     def career
-      Career.find(career_id)
+      @_career ||= Career.find(career_id)
     end
     
     def career_subjects
-      response = Client.get(subject: [academic_unit, career, self, CareerSubject])
-      
-      response.collect do |item|
-        CareerSubject.new(item)
-      end
+      get_and_hydrate_collection CareerSubject, subject: [academic_unit, career, self, CareerSubject]
     end
     
     def career_programme_degrees
-      response = Client.get subject: [academic_unit, career, self, CareerProgrammeDegree]
-      
-      response.collect { |item| CareerProgrammeDegree.new(item) }
+      get_and_hydrate_collection CareerProgrammeDegree, subject: [academic_unit, career, self, CareerProgrammeDegree]
     end
   end
 end
