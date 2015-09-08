@@ -55,6 +55,16 @@ module Integrator
       end
     end
 
-    delegate :get_and_hydrate_collection, :search_and_hydrate_collection, :hydrate_collection, :to => :class
+    def get_and_hydrate_collection(target_class, client_params = {})
+      self.class.get_and_hydrate_collection(target_class, client_params)
+    end
+
+    def search_and_hydrate_collection(target_class, client_params = {})
+      self.class.search_and_hydrate_collection(target_class, client_params)
+    end
+
+    def hydrate_collection(collection, target_class)
+      self.class.hydrate_collection(collection, target_class)
+    end
   end
 end
