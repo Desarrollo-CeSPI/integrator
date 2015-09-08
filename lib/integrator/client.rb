@@ -44,7 +44,7 @@ module Integrator
           fetch_from_cache uri, &request_handler(uri)
         end
 
-        handle_response(uri, response, default: [])
+        handle_response(uri, response, :default => [])
       end
 
       def build_params(params = {})
@@ -95,7 +95,8 @@ module Integrator
         end
       end
 
-      def handle_response(uri, response, default: nil)
+      def handle_response(uri, response, options = {})
+        default = options[:default] || nil
         case response
         when Net::HTTPClientError
           Rails.cache.delete(uri) # Force delete the empty response from the cache
