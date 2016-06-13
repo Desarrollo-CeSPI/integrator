@@ -45,7 +45,7 @@ module Integrator
       end
 
       def hydrate_collection(collection, target_class)
-        collection.map { |item_data| target_class.new(item_data) }
+        collection.to_a.map { |item_data| target_class.new(item_data) }
       end
     end
 
