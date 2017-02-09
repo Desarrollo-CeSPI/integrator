@@ -76,12 +76,16 @@ module Integrator
       end
 
       def fetch_from_cache(uri, &block)
-        Rails.cache.fetch(uri, :expires_in => Integrator.expires_in, &block)
+        Rails.cache.fetch(cache_key(uri), :expires_in => Integrator.expires_in, &block)
       rescue NameError
         # Not in a rails app
         yield
       rescue Exception => error
         raise ServerError.new("Could not establish connection: #{error.message}")
+      end
+
+      def cache_key(uri)
+        Digest::SHA1.hexdigest(uri)
       end
 
       def request_handler(uri)
@@ -99,12 +103,12 @@ module Integrator
         default = options[:default] || nil
         case response
         when Net::HTTPClientError
-          Rails.cache.delete(uri) # Force delete the empty response from the cache
+          Rails.cache.delete(cache_key(uri)) # Force delete the empty response from the cache
           default
         when Net::HTTPSuccess
           ActiveSupport::JSON.decode(response.body).tap do |result|
             # Force delete an empty response from the cache
-            Rails.cache.delete(uri) if result.nil? || result.respond_to?(:empty?) && result.empty?
+            Rails.cache.delete(cache_key(uri)) if result.nil? || result.respond_to?(:empty?) && result.empty?
           end
         else
           raise ServerError.new("Could not establish connection. Message: #{response.message}")
