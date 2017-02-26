@@ -46,8 +46,8 @@ module Integrator
     self.expires_in ||= 1.hour
     raise InvalidUrl.new('You must set the UNLP Integrator APIv2 url!') if @@url.nil?
     raise InvalidToken.new('You must set the UNLP Integrator APIv2 token!') if @@token.nil?
-    raise InvalidToken.new('You must set the UNLP Integrator APIv2 version!') if @@version.nil?
-    raise InvalidToken.new('You must set the UNLP Integrator APIv2 version data location!') if @@version_data_location.nil?
+    raise InvalidVersion.new('You must set the UNLP Integrator APIv2 version!') if @@version.nil?
+    raise InvalidVersionDataLocation.new('You must set the UNLP Integrator APIv2 version data location!') if @@version_data_location.nil?
     
     # remove trailing slash
     @@url.chomp!('/') if @@url.end_with?('/')
