@@ -37,7 +37,7 @@ require "integrator/model/gender"
 require "integrator/model/marital_status"
 
 module Integrator
-  mattr_accessor :url, :token, :expires_in
+  mattr_accessor :url, :token, :version, :version_data_location, :expires_in
   
   # setup Integrator
   def self.setup
@@ -46,6 +46,8 @@ module Integrator
     self.expires_in ||= 1.hour
     raise InvalidUrl.new('You must set the UNLP Integrator APIv2 url!') if @@url.nil?
     raise InvalidToken.new('You must set the UNLP Integrator APIv2 token!') if @@token.nil?
+    raise InvalidToken.new('You must set the UNLP Integrator APIv2 version!') if @@version.nil?
+    raise InvalidToken.new('You must set the UNLP Integrator APIv2 version data location!') if @@version_data_location.nil?
     
     # remove trailing slash
     @@url.chomp!('/') if @@url.end_with?('/')
