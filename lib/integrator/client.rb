@@ -60,6 +60,7 @@ module Integrator
         end
 
         #actual_params = { token: Integrator.token }
+        actual_params = { }
 
         if params.include?(:extra_params)
           actual_params.merge! params[:extra_params]
