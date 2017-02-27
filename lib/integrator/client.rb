@@ -59,6 +59,7 @@ module Integrator
           ''
         end
 
+#TODO first url element mechanism
         #actual_params = { token: Integrator.token }
         actual_params = { }
 
@@ -66,7 +67,9 @@ module Integrator
           actual_params.merge! params[:extra_params]
         end
 
-        ret + "?#{actual_params.to_query}"
+        unless actual_params.empty?
+          ret + "?#{actual_params.to_query}"
+        end 
       end
 
       def with_mini_profiler(tag, &block)
