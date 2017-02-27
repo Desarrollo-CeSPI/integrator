@@ -20,6 +20,7 @@ module Integrator
       def build_uri(params = {})
         ensure_subject(params)
         Integrator.url + '/' + slices_from_subject(params[:subject]) + build_params(params)
+        throw Integrator.url + '/' + slices_from_subject(params[:subject]) + build_params(params)
       end
 
       def build_search_uri(params = {})
