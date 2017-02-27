@@ -20,6 +20,7 @@ module Integrator
       def build_uri(params = {})
         ensure_subject(params)
         Integrator.url + slices_from_subject(params[:subject]) + build_params(params)
+        throw Integrator.url + slices_from_subject(params[:subject]) + build_params(params)
       end
 
       def build_search_uri(params = {})
@@ -95,6 +96,8 @@ module Integrator
           http.use_ssl = url.scheme == 'https'
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
           request = Net::HTTP::Get.new("#{url.path}?#{url.query}")
+          request['Authorization'] = Integrator.token
+          request['x-api-version'] = Integrator.version
           http.request(request)
         end
       end
