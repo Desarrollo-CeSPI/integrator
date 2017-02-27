@@ -67,7 +67,9 @@ module Integrator
           actual_params.merge! params[:extra_params]
         end
 
-        unless actual_params.empty?
+        if actual_params.empty?
+          ret
+        else 
           ret + "?#{actual_params.to_query}"
         end 
       end
