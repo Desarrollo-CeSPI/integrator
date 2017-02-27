@@ -19,12 +19,12 @@ module Integrator
 
       def build_uri(params = {})
         ensure_subject(params)
-        Integrator.url + '/api/' + slices_from_subject(params[:subject]) + '.json' + build_params(params)
+        Integrator.url + slices_from_subject(params[:subject]) + build_params(params)
       end
 
       def build_search_uri(params = {})
         ensure_subject(params)
-        Integrator.url + '/api/' + slices_from_subject(params[:subject]) + '.json/search/' + build_params(params)
+        Integrator.url + slices_from_subject(params[:subject]) + '.json/search/' + build_params(params)
       end
 
       def get(params = {})
