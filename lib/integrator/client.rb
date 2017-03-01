@@ -29,6 +29,8 @@ module Integrator
 
       def get(params = {})
         uri = build_uri(params)
+#TODO sacar, es para forzar borrado de cache        
+        Rails.cache.delete(cache_key(uri))
 
         response = with_mini_profiler("Fetching #{uri}") do
           fetch_from_cache uri, &request_handler(uri)
@@ -100,6 +102,7 @@ module Integrator
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = url.scheme == 'https'
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+#TODO add first url element mechanism          
           request = Net::HTTP::Get.new("#{url.path}?#{url.query}")
           request['Authorization'] = Integrator.token
           request['x-api-version'] = Integrator.version

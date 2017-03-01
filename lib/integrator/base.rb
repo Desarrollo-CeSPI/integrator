@@ -5,6 +5,7 @@ module Integrator
         response = Client.get subject: self, trailing: id
 
         process_response(response) do |r|
+#FIXME si lo descomento, duplica la información cuando se llama a Integrator::DocumentType.all          
           new(r) unless r.empty?
         end
       end
@@ -50,7 +51,12 @@ module Integrator
     end
 
     def initialize(hash)
+      #puts hash.length
+      puts hash.inspect
       hash.each do |key, value|
+#FIXME hace dos llamados, no se porque        
+        #puts "KEY #{key}"
+        #puts "VALUE #{value}"
         instance_variable_set("@#{key}", value) if respond_to?(key.to_sym)
       end
     end
