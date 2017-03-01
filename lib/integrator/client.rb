@@ -29,8 +29,6 @@ module Integrator
 
       def get(params = {})
         uri = build_uri(params)
-#TODO sacar, es para forzar borrado de cache        
-        Rails.cache.delete(cache_key(uri))
 
         response = with_mini_profiler("Fetching #{uri}") do
           fetch_from_cache uri, &request_handler(uri)
