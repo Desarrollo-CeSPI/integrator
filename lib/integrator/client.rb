@@ -19,7 +19,13 @@ module Integrator
 
       def build_uri(params = {})
         ensure_subject(params)
-        Integrator.url + '/' + slices_from_subject(params[:subject]) + build_params(params)
+        if Integrator.version_data_location.eql?('FIRST_URL_PARAMETER')
+        # FIRST_URL_PARAMETER versioning
+          Integrator.url + '/' + Integrator.version + '/' + slices_from_subject(params[:subject]) + build_params(params)
+        else
+        # HEADER versioning
+          Integrator.url + '/' + slices_from_subject(params[:subject]) + build_params(params)
+        end
       end
 
       def build_search_uri(params = {})
@@ -69,7 +75,7 @@ module Integrator
         if actual_params.empty?
           ret
         else 
-          ret + "?#{actual_params.to_query}"
+          ret + "#{actual_params.to_query}"
         end 
       end
 
@@ -96,14 +102,19 @@ module Integrator
 
       def request_handler(uri)
         Proc.new do
-          url = URI.parse uri
-          http = Net::HTTP.new(url.host, url.port)
-          http.use_ssl = url.scheme == 'https'
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-#TODO add first url element mechanism          
-          request = Net::HTTP::Get.new("#{url.path}?#{url.query}")
-          request['Authorization'] = Integrator.token
-          request['x-api-version'] = Integrator.version
+          url                         = URI.parse uri
+          http                        = Net::HTTP.new(url.host, url.port)
+          http.use_ssl                = url.scheme == 'https'
+          http.verify_mode            = OpenSSL::SSL::VERIFY_NONE
+          request                     = Net::HTTP::Get.new("#{url.path}#{url.query}")
+
+          if Integrator.version_data_location.eql?('HEADER')
+            # HEADER versioning
+            request['x-api-version']  = Integrator.version
+          end
+
+          # always 
+          request['Authorization']    = Integrator.token
           http.request(request)
         end
       end
