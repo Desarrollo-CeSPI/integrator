@@ -6,4 +6,10 @@ Integrator.setup do |config|
   config.token = ''
 
   # config.expires_in = 1.hour
+
+  # configure your API version
+  config.version = 'V1'
+
+  # configure your verion data location (HEADER | FIRST_URL_PARAMETER)
+  config.version_data_location = 'HEADER' 
 end
