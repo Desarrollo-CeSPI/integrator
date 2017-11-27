@@ -7,11 +7,11 @@ module Integrator
     end
 
     def person
-      Person.find(person_id)
+      @_person ||= Person.find(person_id)
     end
     
     def academic_unit
-      AcademicUnit.find(academic_unit_id)
+      @_academic_unit ||= AcademicUnit.find(academic_unit_id)
     end
   end
 end

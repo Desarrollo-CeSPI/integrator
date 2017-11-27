@@ -5,45 +5,37 @@ module Integrator
     def to_s
       name
     end
+
+    def name
+      if @name.respond_to?(:html_safe)
+        @name.html_safe
+      else
+        @name
+      end
+    end
     
     def careers
-      response = Client.get(subject: [self, Career])
-      
-      response.collect do |item|
-        Career.new(item)
-      end
+      get_and_hydrate_collection Career, subject: [self, Career]
     end
 
     def degrees
-      response = Client.get(subject: [self, Degree])
-      
-      response.collect do |item|
-        Degree.new(item)
-      end
+      get_and_hydrate_collection Degree, subject: [self, Degree]
     end
     
     def paychecks
-      response = Client.get(subject: [self, Paycheck])
-      
-      response.collect do |item|
-        Paycheck.new(item)
-      end
+      get_and_hydrate_collection Paycheck, subject: [self, Paycheck]
     end
     
     def people
-      response = Client.get(subject: [self, Person])
-      
-      response.collect do |item|
-        Person.new(item)
-      end
+      get_and_hydrate_collection Person, subject: [self, Person]
     end
     
     def search_people(q, type = 'student,authority,teacher')
-      response = Client.search subject: [self, Person], trailing: q.gsub(' ', '%20'), extra_params: { type: type }
-      
-      response.collect do |item|
-        Person.new(item)
-      end
+      search_and_hydrate_collection Person, subject: [self, Person], trailing: URI.encode(q), extra_params: { type: type }
+    end
+
+    def mapped_code
+      AcademicUnitMapper.from_integrator_to_liquidaciones(code)
     end
   end
 end

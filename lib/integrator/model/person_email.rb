@@ -7,7 +7,7 @@ module Integrator
     end
 
     def person
-      Person.find(person_id)
+      @_person ||= Person.find(person_id)
     end
   end
 end

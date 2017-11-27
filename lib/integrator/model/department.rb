@@ -7,15 +7,11 @@ module Integrator
     end
     
     def state
-      State.find(state_id)
+      @_state ||= State.find(state_id)
     end
     
     def cities
-      response = Client.get(subject: [state.country, state, self, City])
-      
-      response.collect do |item|
-        City.new(item)
-      end
+      get_and_hydrate_collection City, subject: [state.country, state, self, City]
     end
   end
 end

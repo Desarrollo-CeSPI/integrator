@@ -7,7 +7,7 @@ module Integrator
     end
 
     def career_programme
-      CareerProgramme.find(career_programme_id)
+      @_career_programme ||= CareerProgramme.find(career_programme_id)
     end
   end
 end

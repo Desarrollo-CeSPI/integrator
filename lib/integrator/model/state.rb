@@ -1,17 +1,17 @@
 module Integrator
   class State < Nested
     attr_reader :id, :name, :country_id
+
+    def to_s
+      name
+    end
     
     def country
-      Country.find(country_id)
+      @_country ||= Country.find(country_id)
     end
     
     def departments
-      response = Client.get(subject: [country, self, Department])
-      
-      response.collect do |item|
-        Department.new(item)
-      end
+      get_and_hydrate_collection Department, subject: [country, self, Department]
     end
   end
 end
