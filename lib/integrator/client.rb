@@ -2,16 +2,30 @@ module Integrator
   class Client
     class << self
       def slices_from_subject(subject)
-        if !subject.is_a? Array
-          subject = [subject]
-        end
+        subject = [subject] unless subject.is_a? Array
 
         slices = []
         subject.each do |item|
           if item.is_a? Class
-            slices << item.name.split('::').last.underscore
+            slices << item.uri_path
           else
-            slices << item.class.name.split('::').last.underscore
+            slices << item.class.uri_path
+            slices << item.id
+          end
+        end
+
+        slices.join('/')
+      end
+
+      def slices_from_subject(subject)
+        subject = [subject] unless subject.is_a? Array
+
+        slices = []
+        subject.each do |item|
+          if item.is_a? Class
+            slices << item.name_for_uri
+          else
+            slices << item.class.name_for_uri
             slices << item.id
           end
         end

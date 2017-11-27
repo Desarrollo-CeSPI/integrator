@@ -42,5 +42,9 @@ module Integrator
         instance_variable_set("@#{key}", value) if respond_to?(key.to_sym)
       end
     end
+
+    def uri_path
+      name.split('::').last.underscore
+    end
   end
 end
