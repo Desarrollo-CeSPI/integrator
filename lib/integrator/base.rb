@@ -47,16 +47,16 @@ module Integrator
       def hydrate_collection(collection, target_class)
         collection.to_a.map { |item_data| target_class.new(item_data) }
       end
+
+      def uri_path
+        name.split('::').last.underscore
+      end
     end
 
     def initialize(hash)
       hash.each do |key, value|
         instance_variable_set("@#{key}", value) if respond_to?(key.to_sym)
       end
-    end
-
-    def uri_path
-      name.split('::').last.underscore
     end
 
     def get_and_hydrate_collection(target_class, client_params = {})
