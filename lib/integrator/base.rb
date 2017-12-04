@@ -2,7 +2,7 @@ module Integrator
   class Base
     class << self
       def find(id)
-        response = Client.get subject: self, trailing: id
+        response = Client.get client_params.merge(subject: self, trailing: id)
 
         process_response(response) do |r|
           new(r) unless r.empty?
@@ -10,7 +10,7 @@ module Integrator
       end
 
       def all
-        response = Client.get subject: self
+        response = Client.get client_params.merge(subject: self)
 
         process_response(response) do |r|
           r.collect do |item|
@@ -20,7 +20,7 @@ module Integrator
       end
 
       def count
-        response = Client.get subject: self, trailing: 'count'
+        response = Client.get client_params.merge(subject: self, trailing: 'count')
         process_response(response) do |r|
           r['count'].to_i
         end
@@ -50,6 +50,10 @@ module Integrator
 
       def uri_path
         name.split('::').last.underscore
+      end
+
+      def client_params
+        {}
       end
     end
 
