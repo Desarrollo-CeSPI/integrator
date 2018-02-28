@@ -3,28 +3,27 @@ module Integrator
     class << self
       def slices_from_subject(subject)
         subject = [subject] unless subject.is_a? Array
-
         slices = []
         subject.each do |item|
           if item.is_a? Class
-            slices << item.name.split('::').last.underscore
+            slices << item.uri_path
           else
-            slices << item.class.name.split('::').last.underscore
+            slices << item.class.uri_path
             slices << item.id
           end
         end
-
         slices.join('/')
       end
 
       def build_uri(params = {})
         ensure_subject(params)
+        base = params.delete(:base_url) || Integrator.url
         if Integrator.version_data_location.eql?('FIRST_URL_PARAMETER')
-        # FIRST_URL_PARAMETER versioning
-          Integrator.url + '/' + Integrator.version + '/' + slices_from_subject(params[:subject]) + build_params(params)
+          # FIRST_URL_PARAMETER versioning
+          base + '/' + Integrator.version + '/' + slices_from_subject(params[:subject]) + build_params(params)
         else
-        # HEADER versioning
-          Integrator.url + '/' + slices_from_subject(params[:subject]) + build_params(params)
+          # HEADER versioning
+          base + '/' + slices_from_subject(params[:subject]) + build_params(params)
         end
       end
 
@@ -35,37 +34,36 @@ module Integrator
 
       def get(params = {})
         uri = build_uri(params)
-
         response = with_mini_profiler("Fetching #{uri}") do
-          fetch_from_cache uri, &request_handler(uri)
+          fetch_from_cache uri, &request_handler(uri, params[:token])
         end
 
-        handle_response(uri, response)
+        handle_response(uri, response, params)
       end
 
       def search(params = {})
         uri = build_search_uri(params)
 
         response = with_mini_profiler("Searching #{uri}") do
-          fetch_from_cache uri, &request_handler(uri)
+          fetch_from_cache uri, &request_handler(uri, params[:token])
         end
 
-        handle_response(uri, response, :default => [])
+        handle_response(uri, response, params.merge(:default => []))
       end
 
       def build_params(params = {})
         ret = if params.include?(:trailing)
-          if params[:trailing].is_a? Array
-            '/' + params[:trailing].map { |x| URI.encode(x.to_s) }.join('/')
-          else
-            '/' + URI.encode(params[:trailing].to_s)
-          end
-        else
-          ''
-        end
+                if params[:trailing].is_a? Array
+                  '/' + params[:trailing].map { |x| URI.encode(x.to_s) }.join('/')
+                else
+                  '/' + URI.encode(params[:trailing].to_s)
+                end
+              else
+                ''
+              end
 
 #TODO first url element mechanism
-        #actual_params = { token: Integrator.token }
+#actual_params = { token: Integrator.token }
         actual_params = { }
 
         if params.include?(:extra_params)
@@ -74,9 +72,9 @@ module Integrator
 
         if actual_params.empty?
           ret
-        else 
+        else
           ret + "#{actual_params.to_query}"
-        end 
+        end
       end
 
       def with_mini_profiler(tag, &block)
@@ -100,7 +98,7 @@ module Integrator
         Digest::SHA1.hexdigest(uri)
       end
 
-      def request_handler(uri)
+      def request_handler(uri, token = nil)
         Proc.new do
           url                         = URI.parse uri
           http                        = Net::HTTP.new(url.host, url.port)
@@ -113,25 +111,33 @@ module Integrator
             request['x-api-version']  = Integrator.version
           end
 
-          # always 
-          request['Authorization']    = Integrator.token
+          # always
+          request['Authorization']    = token || Integrator.token
           http.request(request)
         end
       end
 
       def handle_response(uri, response, options = {})
-        default = options[:default] || nil
-        case response
-        when Net::HTTPClientError
-          Rails.cache.delete(cache_key(uri)) # Force delete the empty response from the cache
-          default
-        when Net::HTTPSuccess
-          ActiveSupport::JSON.decode(response.body).tap do |result|
-            # Force delete an empty response from the cache
-            Rails.cache.delete(cache_key(uri)) if result.nil? || result.respond_to?(:empty?) && result.empty?
-          end
+        if options[:response_handler]
+          options[:response_handler].handle_response(uri, response, options)
         else
-          raise ServerError.new("Could not establish connection. Message: #{response.message}")
+          default = options[:default] || nil
+          case response
+            when Net::HTTPClientError
+              Rails.cache.delete(cache_key(uri)) # Force delete the empty response from the cache
+              default
+            when Net::HTTPSuccess
+              handle_response_success(uri, response)
+            else
+              raise ServerError.new("Could not establish connection. Message: #{response.message}")
+          end
+        end
+      end
+
+      def handle_response_success(uri, response)
+        ActiveSupport::JSON.decode(response.body).tap do |result|
+          # Force delete an empty response from the cache
+          Rails.cache.delete(cache_key(uri)) if result.nil? || result.respond_to?(:empty?) && result.empty?
         end
       end
 

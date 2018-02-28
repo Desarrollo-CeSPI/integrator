@@ -2,7 +2,7 @@ module Integrator
   class Base
     class << self
       def find(id)
-        response = Client.get subject: self, trailing: id
+        response = Client.get client_params.merge(subject: self, trailing: id)
 
         process_response(response) do |r|
           new(r) unless r.empty?
@@ -10,7 +10,7 @@ module Integrator
       end
 
       def all
-        response = Client.get subject: self
+        response = Client.get client_params.merge(subject: self)
 
         process_response(response) do |r|
           r.collect do |item|
@@ -20,12 +20,12 @@ module Integrator
       end
 
       def count
-        response = Client.get subject: self, trailing: 'count'
+        response = Client.get client_params.merge(subject: self, trailing: 'count')
         process_response(response) do |r|
           r['count'].to_i
         end
       end
-      
+
       def process_response(response, &block)
         if response
           if !response.include?('error')
@@ -46,6 +46,14 @@ module Integrator
 
       def hydrate_collection(collection, target_class)
         collection.to_a.map { |item_data| target_class.new(item_data) }
+      end
+
+      def uri_path
+        name.split('::').last.underscore
+      end
+
+      def client_params
+        {}
       end
     end
 
