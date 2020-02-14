@@ -13,4 +13,7 @@ module Integrator
 
   class ServerError < StandardError
   end
+
+  class MissingPerson < StandardError
+  end
 end
