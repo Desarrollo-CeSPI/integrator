@@ -121,11 +121,10 @@ module Integrator
         if options[:response_handler]
           options[:response_handler].handle_response(uri, response, options)
         else
-          default = options[:default] || nil
           case response
             when Net::HTTPClientError
               Rails.cache.delete(cache_key(uri)) # Force delete the empty response from the cache
-              default
+              options[:default]
             when Net::HTTPSuccess
               handle_response_success(uri, response)
             else
