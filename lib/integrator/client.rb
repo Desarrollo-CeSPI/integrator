@@ -1,3 +1,5 @@
+require 'net/http'
+
 module Integrator
   class Client
     class << self
@@ -17,64 +19,51 @@ module Integrator
 
       def build_uri(params = {})
         ensure_subject(params)
-        base = params.delete(:base_url) || Integrator.url
-        if Integrator.version_data_location.eql?('FIRST_URL_PARAMETER')
-          # FIRST_URL_PARAMETER versioning
-          base + '/' + Integrator.version + '/' + slices_from_subject(params[:subject]) + build_params(params)
-        else
-          # HEADER versioning
-          base + '/' + slices_from_subject(params[:subject]) + build_params(params)
-        end
+        base_url = params.delete(:base_url) || Integrator.url
+        slices = slices_from_subject(params[:subject])
+        parameters = build_params(params)
+
+        send(uri_builder, base_url, slices, parameters)
       end
 
       def build_search_uri(params = {})
         ensure_subject(params)
-        Integrator.url + slices_from_subject(params[:subject]) + '.json/search/' + build_params(params)
+        send(uri_builder, Integrator.url, slices_from_subject(params[:subject]) + '.json/search/', build_params(params))
       end
 
       def get(params = {})
-        uri = build_uri(params)
-        response = with_mini_profiler("Fetching #{uri}") do
-          fetch_from_cache uri, &request_handler(uri, params[:token])
-        end
-
-        handle_response(uri, response, params)
+        perform_request build_uri(params), params
       end
 
       def search(params = {})
-        uri = build_search_uri(params)
+        perform_request build_search_uri(params), params, default: []
+      end
 
-        response = with_mini_profiler("Searching #{uri}") do
-          fetch_from_cache uri, &request_handler(uri, params[:token])
-        end
+      protected
 
-        handle_response(uri, response, params.merge(:default => []))
+      def uri_builder
+        @uri_builder ||= "build_uri_with_version_as_#{Integrator.version_data_location.downcase}"
+      end
+
+      def build_uri_with_version_as_first_url_parameter(base_url, slices, params)
+        "#{base_url}/#{Integrator.version}/#{slices}#{params}"
+      end
+
+      def build_uri_with_version_as_header(base_url, slices, params)
+        "#{base_url}/#{slices}#{params}"
       end
 
       def build_params(params = {})
-        ret = if params.include?(:trailing)
-                if params[:trailing].is_a? Array
-                  '/' + params[:trailing].map { |x| URI.encode(x.to_s) }.join('/')
-                else
-                  '/' + URI.encode(params[:trailing].to_s)
-                end
-              else
-                ''
-              end
+        tail = '/' + Array(params[:trailing]).map { |x| CGI.escape(x.to_s) }.join('/') if params[:trailing]
+        tail.to_s + params[:extra_params].to_h.to_query
+      end
 
-#TODO first url element mechanism
-#actual_params = { token: Integrator.token }
-        actual_params = { }
-
-        if params.include?(:extra_params)
-          actual_params.merge! params[:extra_params]
+      def perform_request(uri, params = {}, default = nil)
+        response = with_mini_profiler("Performing request #{uri}") do
+          fetch_from_cache uri, &request_handler(uri, params[:token])
         end
 
-        if actual_params.empty?
-          ret
-        else
-          ret + "#{actual_params.to_query}"
-        end
+        handle_response(uri, response, params.merge(:default => default))
       end
 
       def with_mini_profiler(tag, &block)
@@ -91,28 +80,28 @@ module Integrator
         # Not in a rails app
         yield
       rescue Exception => error
-        raise ServerError.new("Could not establish connection: #{error.message}")
+        raise ServerError, "Could not establish connection: #{error.message}"
+      end
+
+      def delete_from_cache(uri)
+        Rails.cache.delete(cache_key(uri)) rescue nil
       end
 
       def cache_key(uri)
-        Digest::SHA1.hexdigest(uri)
+        Digest::SHA2.hexdigest(uri)
       end
 
       def request_handler(uri, token = nil)
         Proc.new do
-          url                         = URI.parse uri
-          http                        = Net::HTTP.new(url.host, url.port)
-          http.use_ssl                = url.scheme == 'https'
-          http.verify_mode            = OpenSSL::SSL::VERIFY_NONE
-          request                     = Net::HTTP::Get.new("#{url.path}#{url.query}")
+          url              = URI.parse uri
+          http             = Net::HTTP.new(url.host, url.port)
+          http.use_ssl     = url.scheme == 'https'
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          request          = Net::HTTP::Get.new("#{url.path}#{url.query}")
 
-          if Integrator.version_data_location.eql?('HEADER')
-            # HEADER versioning
-            request['x-api-version']  = Integrator.version
-          end
+          request['Authorization'] = token || Integrator.token
+          request['X-Api-Version'] = Integrator.version if Integrator.version_data_location == 'HEADER'
 
-          # always
-          request['Authorization']    = token || Integrator.token
           http.request(request)
         end
       end
@@ -123,12 +112,13 @@ module Integrator
         else
           case response
             when Net::HTTPClientError
-              Rails.cache.delete(cache_key(uri)) # Force delete the empty response from the cache
+              delete_from_cache uri # Force delete the empty response from the cache
               options[:default]
             when Net::HTTPSuccess
               handle_response_success(uri, response)
             else
-              raise ServerError.new("Could not establish connection. Message: #{response.message}")
+              delete_from_cache uri # Force delete the error response from the cache
+              raise ServerError, "Could not establish connection. Message: #{response.message}"
           end
         end
       end
@@ -136,12 +126,12 @@ module Integrator
       def handle_response_success(uri, response)
         ActiveSupport::JSON.decode(response.body).tap do |result|
           # Force delete an empty response from the cache
-          Rails.cache.delete(cache_key(uri)) if result.nil? || result.respond_to?(:empty?) && result.empty?
+          delete_from_cache(uri) if result.nil? || result.respond_to?(:empty?) && result.empty?
         end
       end
 
       def ensure_subject(params)
-        raise Exception.new('You must specify the subject') unless params.include?(:subject)
+        raise ArgumentError, 'You must specify the subject' unless params.include?(:subject)
       end
     end
   end
