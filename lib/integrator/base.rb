@@ -2,6 +2,8 @@ module Integrator
   class Base
     class << self
       def find(id)
+        return if id.nil? # Avoids querying with an empty id, which may return all values
+
         response = Client.get client_params.merge(subject: self, trailing: id)
 
         process_response(response) do |r|
